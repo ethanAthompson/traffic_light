@@ -1,3 +1,4 @@
+use clap::Parser;
 use std::error;
 
 /// Application result type.
@@ -10,6 +11,13 @@ pub struct App {
     pub running: bool,
     /// counter
     pub counter: u8,
+}
+
+#[derive(Parser, Debug)]
+#[command(version = "v0.1", about = "Testing app amount")]
+struct Args {
+    #[arg(short, long, default_value_t = 1)]
+    message: u8,
 }
 
 impl Default for App {
@@ -36,7 +44,12 @@ impl App {
     }
 
     pub fn increment_counter(&mut self) {
-        if let Some(res) = self.counter.checked_add(1) {
+        let args = Args::parse();
+
+        // if let Some(res) = self.counter.checked_add(1) {
+        // self.counter = res;
+        // }
+        if let Some(res) = self.counter.checked_add(args.message) {
             self.counter = res;
         }
     }
