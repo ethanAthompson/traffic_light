@@ -1,10 +1,10 @@
+use ratatui::backend::CrosstermBackend;
+use ratatui::Terminal;
 use rs_traffic_light::app::{App, AppResult};
 use rs_traffic_light::event::{Event, EventHandler};
 use rs_traffic_light::handler::handle_key_events;
 use rs_traffic_light::tui::Tui;
 use std::io;
-use ratatui::backend::CrosstermBackend;
-use ratatui::Terminal;
 
 fn main() -> AppResult<()> {
     // Create an application.
