@@ -1,0 +1,12 @@
+[config]
+code = "Welcome to Traffic Lights in rust"
+
+# In Milliseconds
+dit = 55
+dah = 165
+daaih = 325
+
+# Pins Used
+g17 = true
+g27 = true
+g22 = true
