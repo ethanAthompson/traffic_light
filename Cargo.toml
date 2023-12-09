@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 crossterm = "0.26.1"
 ratatui = "0.24.0"
+tui-input = "0.8.0"

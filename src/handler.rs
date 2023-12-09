@@ -21,6 +21,9 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         KeyCode::Left => {
             // app.decrement_counter();
         }
+        KeyCode::Backspace => {
+            app.adjust_input_modes(key_event);
+        }
         // Other handlers you could add here.
         _ => {}
     }
