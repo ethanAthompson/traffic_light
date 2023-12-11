@@ -1,3 +1,4 @@
+//
 use std::{collections::HashSet, rc::Rc};
 
 use ratatui::{
@@ -10,6 +11,7 @@ use ratatui::{
 
 use crate::{app::App, components::morsecode::system::morse_code_text, utils::text::space_text};
 
+/// Every app atleast needs a navbar right?
 pub fn navbar_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>, app: &mut App) {
     frame.render_widget(
         Paragraph::default().block(
@@ -22,28 +24,25 @@ pub fn navbar_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>, app: &mut App) {
     );
 }
 
-// pub fn navbar_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>, app: &mut App) {
-// navbar_pages(frame, layout.clone(), app);
-// navbar_tabs(frame, layout.clone(), app);
-// }
-
 pub fn navbar_tab_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>, app: &mut App) {
     let widget = Tabs::new(app.tabs.clone())
         .block(
             Block::default()
-                .title("")
-                .style(Style::default().fg(Color::DarkGray))
+                .title(space_text("Morse Code"))
+                .style(Style::default().fg(Color::White))
                 .title_style(Style::default().fg(Color::White))
-                .borders(Borders::TOP)
-                .border_set(symbols::border::ROUNDED)
-                .title_alignment(Alignment::Center),
+                .border_style(Style::default().fg(Color::White))
+                .borders(Borders::ALL)
+                .border_set(symbols::border::DOUBLE),
         )
-        .highlight_style(Style::default().fg(Color::White))
+        .style(Style::default().fg(Color::White))
+        .highlight_style(Style::default().fg(Color::DarkGray))
         .select(app.selected);
 
     frame.render_widget(widget, layout[0]);
 }
 
+/// The page system supposed to be generic if i what that means
 pub fn navbar_page_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>, app: &mut App) {
     let page_on = match app.selected {
         0 => format!(" Page: Home "),
@@ -54,7 +53,7 @@ pub fn navbar_page_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>, app: &mut A
         _ => Block::default()
             .title(page_on)
             .borders(Borders::TOP)
-            .title_alignment(ratatui::prelude::Alignment::Left)
+            .title_alignment(ratatui::prelude::Alignment::Right)
             .style(Style::default().fg(Color::White))
             .border_set(symbols::border::ROUNDED),
     };

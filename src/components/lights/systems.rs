@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use ratatui::{
     prelude::{Alignment, Rect},
-    style::{Color, Style},
+    style::{Color, Modifier, Style, Stylize},
     symbols,
     widgets::{Block, Borders, Paragraph},
     Frame,
@@ -31,5 +31,20 @@ pub fn light_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>, app: &mut App) {
                 .title_alignment(Alignment::Center),
         ),
         layout[0],
+    );
+}
+
+pub fn play_light_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>, app: &mut App) {
+    frame.render_widget(
+        Paragraph::default()
+            .block(
+                Block::default()
+                    .title(format!(" Press Ctrl-P to play! "))
+                    .add_modifier(Modifier::BOLD)
+                    .rapid_blink()
+                    .title_alignment(Alignment::Center),
+            )
+            .style(Style::default().bg(Color::DarkGray)),
+        layout[3],
     );
 }

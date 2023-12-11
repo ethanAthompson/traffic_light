@@ -21,7 +21,7 @@ pub fn header_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>, app: &mut App) {
     frame.render_widget(
         Paragraph::default().block(
             Block::default()
-                .borders(Borders::ALL)
+                .borders(Borders::TOP)
                 .title(format!(" Traffic Light Game v{} ", version))
                 .title_alignment(Alignment::Center),
         ),

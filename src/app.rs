@@ -1,10 +1,13 @@
 use crate::components::{
     inputbox::InputMode,
     morsecode::{ConnectedPins, MorseCode, MorseCodeUnits},
+    tomlsave::TomlOperations,
 };
+use chrono::{DateTime, Utc};
 use crossterm::event::{Event, KeyCode, KeyEvent};
 use ratatui::widgets::ScrollbarState;
-use std::{collections::HashSet, error};
+use std::{collections::HashSet, error, fs, ops::AddAssign};
+use toml::{map::Map, Value};
 
 /// Application result type.
 pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
@@ -14,6 +17,7 @@ pub enum Selected {
     Yes,
     No,
 }
+
 /// Application.
 #[derive(Debug)]
 pub struct App {
@@ -36,6 +40,7 @@ pub struct App {
     pub input_mode: InputMode,
     /// History is saved to toml file, then is loaded back constantly
     pub history: Vec<String>,
+    pub toml_data: Vec<(String, (String, String))>,
     /// Status of translating input to morse code
     pub translating: bool,
     /// The state for popup on key [p]
@@ -63,6 +68,7 @@ impl Default for App {
             running: true,
             reacted: 0,
             is_selected: Selected::Yes,
+            toml_data: vec![("Home".into(), ("code".into(), "morse".into()))],
             pressed: false,
             is_connected: false,
             is_helped: false,
@@ -131,20 +137,30 @@ impl App {
     }
 
     pub fn remove_tab(&mut self, tab: usize) {
-        // self.tabs.remove(tab);
-        self.tabs = self.tabs.clone();
+        self.tabs.remove(tab);
+        // self.selected = 0;
+        self.tab_added = self.tabs.len() as u8 - tab as u8;
     }
 
     /// super simple tab addition
     pub fn add_tab(&mut self, tab: usize) {
-        let tab_title = format!("Tab {}", self.tab_added + 1);
+        let utc_time: DateTime<Utc> = Utc::now();
+        let est_time: DateTime<chrono::FixedOffset> =
+            utc_time.with_timezone(&chrono::FixedOffset::east(-5 * 3600));
+
+        let formatted_time = est_time.format("%d-%b-%Y %H:%M:%S");
+        let tab_title = format!("Tab: {}", formatted_time);
 
         // tabs were being added behind Home tab
         self.tabs.insert(tab + 1, tab_title);
     }
 
+    pub fn to_toml(&self) {
+        // traffic_light_data.toml
+    }
+
     /// I needed to upload tabs to a toml file and load in extra tabs there as soon as you enter
-    pub fn tab_save() {}
+    pub fn tab_save(&self) {}
 
     pub fn clamp_selected(&self, new_selected: usize) -> usize {
         new_selected.clamp(0, self.tabs.len())
@@ -177,7 +193,14 @@ impl App {
     pub fn submit_message(&mut self) {
         // self.tabs.push(self.input.to_lowercase());
 
+        TomlOperations::create(
+            self.tabs[self.selected].as_str(),
+            self.history[self.selected].as_str(),
+            self.input.as_str(),
+            self.code.as_str(),
+        );
         self.generate();
+        self.tabs.sort();
         self.tab_added += 1;
 
         // idx bugs out if I clear the input
