@@ -1,5 +1,4 @@
-# Rust Traffic Light
-
+# Rust Traffic Light 
 ## Table of Contents
 
   * [Introduction](#introduction)

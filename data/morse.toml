@@ -1,6 +1,8 @@
 # tab.* gets matched to the tab in the application
 [tab.1]
+title = "Home"
 code = "Rust is a good language!"
 
 [tab.2]
+title = "Traffic"
 code = "Javascript is a bad language!"

@@ -6,6 +6,9 @@ license = "MIT"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.75"
 crossterm = "0.26.1"
+emojis = "0.6.1"
 ratatui = "0.24.0"
-tui-input = "0.8.0"
+rust_gpiozero = "0.2.1"
+tui-big-text = "0.2.1"

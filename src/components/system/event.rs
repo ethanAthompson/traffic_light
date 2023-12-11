@@ -50,13 +50,14 @@ impl EventHandler {
                             CrosstermEvent::Resize(w, h) => sender.send(Event::Resize(w, h)),
                             CrosstermEvent::FocusGained => Ok(()),
                             CrosstermEvent::FocusLost => Ok(()),
-                            CrosstermEvent::Paste(_) => unimplemented!(),
+                            CrosstermEvent::Paste(_) => Ok(()),
                         }
                         .expect("failed to send terminal event")
                     }
 
                     if last_tick.elapsed() >= tick_rate {
                         sender.send(Event::Tick).expect("failed to send tick event");
+
                         last_tick = Instant::now();
                     }
                 }

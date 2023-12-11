@@ -1,9 +1,9 @@
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 use rs_traffic_light::app::{App, AppResult};
-use rs_traffic_light::event::{Event, EventHandler};
+use rs_traffic_light::components::system::event::{Event, EventHandler};
+use rs_traffic_light::components::system::tui::Tui;
 use rs_traffic_light::handler::handle_key_events;
-use rs_traffic_light::tui::Tui;
 use std::io;
 
 fn main() -> AppResult<()> {
@@ -13,8 +13,9 @@ fn main() -> AppResult<()> {
     // Initialize the terminal user interface.
     let backend = CrosstermBackend::new(io::stderr());
     let terminal = Terminal::new(backend)?;
-    let events = EventHandler::new(250);
+    let events = EventHandler::new(50);
     let mut tui = Tui::new(terminal, events);
+
     tui.init()?;
 
     // Start the main loop.

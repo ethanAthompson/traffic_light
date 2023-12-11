@@ -1,22 +1,30 @@
 use std::rc::Rc;
 
+use anyhow::Result;
+use tui_big_text::BigTextBuilder;
+
 use ratatui::{
     prelude::{Alignment, Rect},
+    style::{Color, Style},
     symbols,
-    widgets::{Block, Borders},
+    text::{Line, Span},
+    widgets::{Block, Borders, Paragraph},
     Frame,
 };
 
-use crate::utils::text::space_text;
+use crate::app::App;
 
-/// every app needs a title right?
-pub fn header_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>) {
+/// Header for the application
+pub fn header_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>, app: &mut App) {
+    let version = env!("CARGO_PKG_VERSION");
+
     frame.render_widget(
-        Block::new()
-            .borders(Borders::TOP)
-            .border_set(symbols::border::ROUNDED)
-            .title(space_text("Traffic Light Application"))
-            .title_alignment(Alignment::Center),
+        Paragraph::default().block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title(format!(" Traffic Light Game v{} ", version))
+                .title_alignment(Alignment::Center),
+        ),
         layout[0],
     );
 }
