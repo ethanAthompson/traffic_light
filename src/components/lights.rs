@@ -5,8 +5,12 @@ use ratatui::{
         Block, Borders,
     },
 };
+use rust_gpiozero::*;
+use std::{thread, time::Duration};
 
 use crate::utils::text::space_text;
+
+use super::morsecode::ConnectedPins;
 
 pub mod layout;
 pub mod queries;
@@ -43,6 +47,14 @@ impl Default for TrafficLight {
 }
 
 impl TrafficLight {
+    pub fn swap_r(&mut self) {
+        self.on = self.off;
+    }
+
+    pub fn swap_l(&mut self) {
+        self.off = self.on;
+    }
+
     pub fn new(self, light: Lights) -> Self {
         match light {
             Lights::Red => Self {
@@ -72,16 +84,72 @@ impl TrafficLight {
         }
     }
 
+    pub fn duration(light: Lights) {
+        match light {
+            Lights::Red => thread::sleep(Duration::from_secs(1000)),
+            Lights::Yellow => thread::sleep(Duration::from_secs(3000)),
+            Lights::Green => thread::sleep(Duration::from_millis(5000)),
+            _ => unimplemented!(),
+        }
+    }
+
+    // self.off = self.on
     pub fn construct(self) -> Canvas<'static, impl Fn(&mut Context<'_>)> {
         Canvas::default()
-            .background_color(self.on)
+            .background_color(self.off)
             .block(
                 Block::default()
                     .title(space_text(self.name.as_str()))
                     .borders(Borders::ALL)
                     .border_type(ratatui::widgets::BorderType::Rounded)
-                    .border_style(Style::default().fg(self.on)),
+                    .border_style(Style::default().fg(self.off)),
             )
             .paint(|ctx| {})
     }
+}
+
+impl Hardware for ConnectedPins {}
+
+pub trait Hardware {
+    fn red_light() -> LED {
+        LED::new(ConnectedPins::GPIO17.value())
+    }
+    fn yellow_light() -> LED {
+        LED::new(ConnectedPins::GPIO27.value())
+    }
+    fn green_light() -> LED {
+        LED::new(ConnectedPins::GPIO22.value())
+    }
+    fn buzzer() -> Buzzer {
+        Buzzer::new(ConnectedPins::GPIO23.value())
+    }
+}
+
+pub fn play_lights() {
+    thread::spawn(|| {
+        let mut red_light = TrafficLight::default().new(Lights::Red);
+        let mut yellow_light = TrafficLight::default().new(Lights::Yellow);
+        let mut green_light = TrafficLight::default().new(Lights::Green);
+
+        // Red Light
+        ConnectedPins::red_light().on();
+        TrafficLight::swap_r(&mut red_light);
+        TrafficLight::duration(Lights::Red);
+        TrafficLight::swap_l(&mut red_light);
+        ConnectedPins::red_light().off();
+
+        // Yellow Light
+        ConnectedPins::yellow_light().on();
+        TrafficLight::swap_r(&mut yellow_light);
+        TrafficLight::duration(Lights::Yellow);
+        TrafficLight::swap_l(&mut yellow_light);
+        ConnectedPins::yellow_light().off();
+
+        // Green Light
+        ConnectedPins::green_light().on();
+        TrafficLight::swap_r(&mut green_light);
+        TrafficLight::duration(Lights::Green);
+        TrafficLight::swap_l(&mut green_light);
+        ConnectedPins::green_light().off();
+    });
 }

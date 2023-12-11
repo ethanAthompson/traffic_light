@@ -1,8 +1,14 @@
 use crate::{
     app::{App, AppResult, Selected},
-    components::inputbox::InputMode,
+    components::{
+        inputbox::InputMode,
+        lights::{play_lights, Hardware, TrafficLight},
+        morsecode::{ConnectedPins, MorseCode, Sound, SuperBuzzer},
+    },
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
+use rppal::gpio::*;
+use rust_gpiozero::Buzzer;
 
 /// Handles the key events and updates the state of [`App`].
 pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
@@ -23,10 +29,22 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
             }
         }
 
+        KeyCode::Char('f') => {
+            if key_event.modifiers == KeyModifiers::CONTROL {
+                if app.input.is_empty() {
+                } else {
+                    // play the sound in live person
+                    SuperBuzzer::play_sound(
+                        &mut ConnectedPins::buzzer(),
+                        MorseCode::new(&app.input),
+                    );
+                }
+            }
+        }
+
         KeyCode::Char('p') => {
             if key_event.modifiers == KeyModifiers::CONTROL {
-                // play the sound in live person
-                // app.reacted = 1;
+                play_lights();
             }
         }
 

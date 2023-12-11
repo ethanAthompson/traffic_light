@@ -1,5 +1,11 @@
 use rust_gpiozero::Buzzer;
-use std::{fmt, thread::sleep, time::Duration};
+use std::{
+    fmt,
+    thread::{self, sleep},
+    time::Duration,
+};
+
+use crate::components::lights::Hardware;
 
 pub mod system;
 
@@ -97,7 +103,7 @@ impl ConnectedPins {
 /// Ok, this actually plays the sound, but the beeep!
 impl SuperBuzzer {
     // in order to play sound
-    fn play_sound(buzz: &mut Buzzer, codes: Vec<&str>) {
+    pub fn play_sound(buzz: &mut Buzzer, codes: Vec<&str>) {
         let msg = codes.join("");
         let msg2: Vec<&str> = msg.split("").collect();
         let code: Vec<&str> = msg2.into_iter().filter(|&line| !line.is_empty()).collect();
@@ -130,30 +136,46 @@ impl fmt::Display for SuperBuzzer {
 /// The suupa buzzer plays a sound, just time delays
 impl Sound for SuperBuzzer {
     fn play_dit(buzz: &mut Buzzer, size: u64) {
+        thread::spawn(|| {
+            ConnectedPins::buzzer().on();
+            sleep(Duration::from_millis(55));
+            ConnectedPins::buzzer().off();
+            sleep(Duration::from_millis(1000));
+        });
         // buzz.on();
         // Remove if too much
         // println!("{}", format!("{}", SuperBuzzer::Dit));
-        sleep(Duration::from_millis(size));
+        // sleep(Duration::from_millis(size));
         // buzz.off();
-        sleep(Duration::from_millis(ConnectedPins::IDLE(1000).unpack()));
+        // sleep(Duration::from_millis(ConnectedPins::IDLE(1000).unpack()));
     }
 
     fn play_dah(buzz: &mut Buzzer, size: u64) {
-        // buzz.on();
-        // Remove if too much
-        // println!("{}", format!("{}", SuperBuzzer::Dah));
-        sleep(Duration::from_millis(size));
-        // buzz.off();
-        sleep(Duration::from_millis(ConnectedPins::IDLE(1000).unpack()));
+        thread::spawn(|| {
+            ConnectedPins::buzzer().on();
+            sleep(Duration::from_millis(165));
+            ConnectedPins::buzzer().off();
+            sleep(Duration::from_millis(1000));
+        }); // buzz.on();
+            // Remove if too much
+            // println!("{}", format!("{}", SuperBuzzer::Dah));
+            // sleep(Duration::from_millis(size));
+            // buzz.off();
+            // sleep(Duration::from_millis(ConnectedPins::IDLE(1000).unpack()));
     }
 
     fn play_daaih(buzz: &mut Buzzer, size: u64) {
-        // buzz.on();
-        // Remove if too much
-        // println!("{}", format!("{}", SuperBuzzer::Daaih));
-        sleep(Duration::from_millis(size));
-        // buzz.off();
-        sleep(Duration::from_millis(ConnectedPins::IDLE(1000).unpack()));
+        thread::spawn(|| {
+            ConnectedPins::buzzer().on();
+            sleep(Duration::from_millis(385));
+            ConnectedPins::buzzer().off();
+            sleep(Duration::from_millis(1000));
+        }); // buzz.on();
+            // Remove if too much
+            // println!("{}", format!("{}", SuperBuzzer::Daaih));
+            // sleep(Duration::from_millis(size));
+            // buzz.off();
+            // sleep(Duration::from_millis(ConnectedPins::IDLE(1000).unpack()));
     }
 }
 
