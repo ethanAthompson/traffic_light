@@ -7,20 +7,17 @@ use serde::{Deserialize, Serialize};
 pub mod system;
 
 #[derive(Debug, Default, Serialize)]
-pub struct TabSlots<'a> {
-    tabs: BTreeMap<&'a str, TabSlot<'a>>,
+pub struct TabSlots {
+    pub tabs: BTreeMap<String, TabSlot>,
 }
 
 #[derive(Debug, Serialize)]
-struct TabSlot<'a> {
-    #[serde(rename = "title")]
-    title: &'a str,
-
+pub struct TabSlot {
     #[serde(rename = "uncoded")]
-    uncoded: &'a str,
+    pub uncoded: String,
 
     #[serde(rename = "encoded")]
-    encoded: &'a str,
+    pub encoded: String,
 }
 
 pub const GAMEDATA: &str = "traffic_light_game_data.toml";
@@ -33,17 +30,8 @@ pub enum TomlOperations {
 }
 
 impl TomlOperations {
-    pub fn create(tab_index: &str, title: &str, uncoded: &str, encoded: &str) {
+    pub fn create(tab_index: &str, uncoded: &str, encoded: &str) {
         let mut file = TabSlots::default();
-
-        file.tabs.insert(
-            tab_index,
-            TabSlot {
-                title,
-                uncoded,
-                encoded,
-            },
-        );
 
         let toml_string = toml::to_string(&file).expect("Could not encode TOML Value");
 

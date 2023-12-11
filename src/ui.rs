@@ -89,9 +89,17 @@ pub fn render(app: &mut App, frame: &mut Frame) {
         .vertical_margin(1)
         .split(status_div[1]);
 
+    let pins_div = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Percentage(100)])
+        .horizontal_margin(2)
+        .vertical_margin(1)
+        .split(status_div[0]);
+
     header_system(frame, header_div.clone(), app);
     footer_system(frame, div.clone(), app);
     connected_pins_system(frame, status_div.clone(), app);
+    connected_pins_status_system(frame, pins_div.clone(), app);
     commands_system(frame, status_div.clone(), app);
     command_text_system(frame, command_div.clone(), app);
     copyright_system(frame, status_div.clone(), app);

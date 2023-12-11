@@ -33,7 +33,7 @@ pub fn navbar_tab_system(frame: &mut Frame<'_>, layout: Rc<[Rect]>, app: &mut Ap
                 .title_style(Style::default().fg(Color::White))
                 .border_style(Style::default().fg(Color::White))
                 .borders(Borders::ALL)
-                .border_set(symbols::border::DOUBLE),
+                .border_set(symbols::border::ROUNDED),
         )
         .style(Style::default().fg(Color::White))
         .highlight_style(Style::default().fg(Color::DarkGray))

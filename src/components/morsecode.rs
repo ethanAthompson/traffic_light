@@ -8,19 +8,18 @@ pub mod system;
 pub enum MorseCode {}
 
 // General Purpose Input Output Pins
-#[repr(u8)]
 #[derive(Debug)]
 pub enum ConnectedPins {
     /// IDLE
     IDLE(u64),
     /// Red Light
-    GPIO17 = 17,
+    GPIO17,
     /// Yellow Light
-    GPIO27 = 27,
+    GPIO27,
     /// Green Light
-    GPIO22 = 22,
+    GPIO22,
     /// Buzzer
-    GPIO23 = 23,
+    GPIO23,
     None,
 }
 
@@ -79,6 +78,18 @@ impl Unpack for ConnectedPins {
         match self {
             Self::IDLE(milliseconds) => milliseconds.to_owned(),
             _ => 0.to_owned(),
+        }
+    }
+}
+
+impl ConnectedPins {
+    pub fn value(&self) -> u8 {
+        match self {
+            Self::GPIO17 => 17,
+            Self::GPIO27 => 27,
+            Self::GPIO22 => 22,
+            Self::GPIO23 => 23,
+            _ => 0,
         }
     }
 }

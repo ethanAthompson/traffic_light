@@ -1,11 +1,14 @@
 use crate::components::{
     inputbox::InputMode,
     morsecode::{ConnectedPins, MorseCode, MorseCodeUnits},
-    tomlsave::TomlOperations,
+    tomlsave::{TabSlot, TabSlots, TomlOperations, GAMEDATA},
 };
 use chrono::{DateTime, Utc};
 use crossterm::event::{Event, KeyCode, KeyEvent};
-use ratatui::widgets::ScrollbarState;
+use ratatui::{
+    style::{Color, Style},
+    widgets::ScrollbarState,
+};
 use std::{collections::HashSet, error, fs, ops::AddAssign};
 use toml::{map::Map, Value};
 
@@ -40,7 +43,8 @@ pub struct App {
     pub input_mode: InputMode,
     /// History is saved to toml file, then is loaded back constantly
     pub history: Vec<String>,
-    pub toml_data: Vec<(String, (String, String))>,
+    /// Each data I want to populate the toml file with
+    pub toml_data: TabSlots,
     /// Status of translating input to morse code
     pub translating: bool,
     /// The state for popup on key [p]
@@ -68,8 +72,8 @@ impl Default for App {
             running: true,
             reacted: 0,
             is_selected: Selected::Yes,
-            toml_data: vec![("Home".into(), ("code".into(), "morse".into()))],
             pressed: false,
+            toml_data: TabSlots::default(),
             is_connected: false,
             is_helped: false,
             pins: ConnectedPins::None,
@@ -107,6 +111,53 @@ impl App {
         self.is_helped = !self.is_helped;
     }
 
+    pub fn update_toml(&mut self) {
+        let saved_data = toml::to_string(&self.toml_data).expect("Could not encode TOML Value");
+        fs::write(GAMEDATA, saved_data.clone()).expect("Could not write your data, sorry");
+    }
+
+    pub fn check_connection(&mut self, pins: u8) -> Style {
+        let pin0_connected_style = Style::default().bg(Color::Green);
+        let pin1_connected_style = Style::default().bg(Color::Green);
+        let pin2_connected_style = Style::default().bg(Color::Green);
+        let pin3_connected_style = Style::default().bg(Color::Green);
+        let not_pin0connected_style = Style::default().bg(Color::Red);
+        let not_pin1connected_style = Style::default().bg(Color::Red);
+        let not_pin2connected_style = Style::default().bg(Color::Red);
+        let not_pin3connected_style = Style::default().bg(Color::Red);
+
+        match pins {
+            17 => {
+                if self.is_connected {
+                    pin0_connected_style
+                } else {
+                    not_pin0connected_style
+                }
+            }
+            27 => {
+                if self.is_connected {
+                    pin1_connected_style
+                } else {
+                    not_pin1connected_style
+                }
+            }
+            22 => {
+                if self.is_connected {
+                    pin2_connected_style
+                } else {
+                    not_pin2connected_style
+                }
+            }
+            23 => {
+                if self.is_connected {
+                    pin3_connected_style
+                } else {
+                    not_pin3connected_style
+                }
+            }
+            _ => unimplemented!(),
+        }
+    }
     // Morse Code Feature
     pub fn generate(&mut self) {
         let input = self.input.clone();
@@ -153,10 +204,15 @@ impl App {
 
         // tabs were being added behind Home tab
         self.tabs.insert(tab + 1, tab_title);
-    }
 
-    pub fn to_toml(&self) {
-        // traffic_light_data.toml
+        // Only saves tabs that are not home
+        // if self.tabs[self.selected] == "Home" {
+        // } else {
+        self.generate();
+        self.insert(tab + 1);
+
+        self.update_toml();
+        // }
     }
 
     /// I needed to upload tabs to a toml file and load in extra tabs there as soon as you enter
@@ -190,16 +246,25 @@ impl App {
         self.generate();
     }
 
+    pub fn insert(&mut self, tab: usize) {
+        // updates file properly
+        self.toml_data.tabs.insert(
+            self.tabs[tab].to_string(),
+            // "Test",
+            TabSlot {
+                uncoded: self.input.to_string(),
+                // uncoded: "Test1",
+                encoded: self.code.to_string(),
+                // encoded: "Test2",
+            },
+        );
+    }
+
     pub fn submit_message(&mut self) {
         // self.tabs.push(self.input.to_lowercase());
 
-        TomlOperations::create(
-            self.tabs[self.selected].as_str(),
-            self.history[self.selected].as_str(),
-            self.input.as_str(),
-            self.code.as_str(),
-        );
-        self.generate();
+        // self.generate();
+
         self.tabs.sort();
         self.tab_added += 1;
 
